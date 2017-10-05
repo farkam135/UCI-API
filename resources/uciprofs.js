@@ -99,7 +99,7 @@ function stopAutoScrape() {
     clearTimeout(autoScrapeTimeout);
 }
 
-refreshProfs();
+//refreshProfs();
 
 module.exports.getProfessor = getProfessor;
 module.exports.startAutoScrape = startAutoScrape;
