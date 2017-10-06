@@ -1,14 +1,13 @@
 {
-  "name": "uciwlcheck",
+  "name": "UCI",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec \"babel-node app.js --presets es2015,stage-2\" app.js",
-    "parser": "babel-node sample.js --presets es2015,stage-2 sample.js"
+    "start": "nodemon --exec \"babel-node app.js --presets es2015,stage-2\" index.js"
   },
-  "author": "",
+  "author": "Kamron Erani",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^0.22.0",
