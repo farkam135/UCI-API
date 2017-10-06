@@ -1,7 +1,6 @@
-//let request = require('request');
-import cheerio from 'cheerio';
-import  { parseString } from 'xml2js';
-import rp from 'request-promise';
+let cheerio = require('cheerio');
+let parseString = require('xml2js').parseString;
+let rp = require('request-promise');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 

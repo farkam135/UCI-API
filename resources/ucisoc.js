@@ -1,5 +1,5 @@
-import cheerio from "cheerio";
-import rp from "request-promise";
+let cheerio = require("cheerio");
+let rp = require("request-promise");
 
 let YEAR_TERM = undefined;
 const DEPTS = [];

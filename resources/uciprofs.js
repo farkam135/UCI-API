@@ -1,4 +1,4 @@
-import rp from 'request-promise';
+let rp = require('request-promise');
 
 /**
  * An object representing a professor

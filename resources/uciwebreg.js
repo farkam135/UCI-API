@@ -1,10 +1,10 @@
-var request = require('request');
-var cheerio = require('cheerio');
+let request = require('request');
+let cheerio = require('cheerio');
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 //The headers for the packet
-var headers = {
+let headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
 }
 
@@ -18,7 +18,7 @@ var headers = {
 function authenticate(ucinetid, password) {
     let promise = new Promise(function (resolve, reject) {
         //The options for the packet
-        var options = {
+        let options = {
             url: 'http://www.reg.uci.edu/cgi-bin/webreg-redirect.sh',
             method: 'POST',
             headers: headers,
@@ -29,7 +29,7 @@ function authenticate(ucinetid, password) {
 
         request(options, function (error, response, body) {
             if (!error && response.statusCode == 302) {
-                var transportLocation = response.headers['location'];
+                let transportLocation = response.headers['location'];
                 console.log("Received Transport Location...");
                 //GET transport location
                 options = {
@@ -40,10 +40,10 @@ function authenticate(ucinetid, password) {
 
                 request(options, function (error, response, body) {
                     if (!error && response.statusCode == 200) {
-                        var authenticationPortal = /url=(.*)">/.exec(body)[1]; //Gets the auth portal url from the body.
-                        var returnUrl = /return_url=(.*\d)&/.exec(authenticationPortal)[1]; //Extracts the return url from the body.
-                        var callCode = /call=(\d+)/.exec(authenticationPortal)[1]; //Extracts the call code from the body.
-                        var webregUrl = /(.*)?/.exec(returnUrl)[1];
+                        let authenticationPortal = /url=(.*)">/.exec(body)[1]; //Gets the auth portal url from the body.
+                        let returnUrl = /return_url=(.*\d)&/.exec(authenticationPortal)[1]; //Extracts the return url from the body.
+                        let callCode = /call=(\d+)/.exec(authenticationPortal)[1]; //Extracts the call code from the body.
+                        let webregUrl = /(.*)?/.exec(returnUrl)[1];
 
                         console.log("Received Authentication Portal...");
                         //GET transport location
@@ -66,7 +66,7 @@ function authenticate(ucinetid, password) {
                         request(options, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 //GET transport location
-                                var auth = response.headers['set-cookie'][0].split(';')[0];
+                                let auth = response.headers['set-cookie'][0].split(';')[0];
                                 console.log("Authenticated With UCI...");
                                 options = {
                                     url: returnUrl,
@@ -79,12 +79,12 @@ function authenticate(ucinetid, password) {
                                     if (!error && response.statusCode == 200) {
 
                                         if (hasError(body)) {
-                                            var $ = cheerio.load(body, {
+                                            let $ = cheerio.load(body, {
                                                 normalizeWhitespace: true
                                             });
 
-                                            var errorMsg = $('div.WebRegErrorMsg');
-                                            var errorMsgText = errorMsg.text().trim();
+                                            let errorMsg = $('div.WebRegErrorMsg');
+                                            let errorMsgText = errorMsg.text().trim();
                                             reject(errorMsgText);
                                         }
                                         else {
@@ -137,13 +137,13 @@ function navigateMenu(page, mode, webregUrl, callCode, auth, callback) {
 
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            var message = null
+            let message = null
             if (hasMessage(body)) {
-                var $ = cheerio.load(body, {
+                let $ = cheerio.load(body, {
                     normalizeWhitespace: true
                 });
 
-                var infoMsg = $('div.WebRegInfoMsg');
+                let infoMsg = $('div.WebRegInfoMsg');
                 message = infoMsg.text().trim();
             }
             if (callback != null) { callback(message); }
@@ -164,10 +164,10 @@ function navigateMenu(page, mode, webregUrl, callCode, auth, callback) {
  * @return {promise} Promise that resolves in true if added else false and an error message. 
  */
 function addCourse(page, courseCode, webregUrl, callCode, auth) {
-    var deferred = Promise.defer();
+    let deferred = Promise.defer();
 
     //The options for the packet
-    var options = {
+    let options = {
         url: webregUrl,
         method: 'POST',
         headers: headers,
@@ -184,12 +184,12 @@ function addCourse(page, courseCode, webregUrl, callCode, auth) {
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             if (hasError(body)) {
-                var $ = cheerio.load(body, {
+                let $ = cheerio.load(body, {
                     normalizeWhitespace: true
                 });
 
-                var errorMsg = $('div.WebRegErrorMsg');
-                var errorMsgText = errorMsg.text();
+                let errorMsg = $('div.WebRegErrorMsg');
+                let errorMsgText = errorMsg.text();
                 deferred.resolve({
                     success: false,
                     courseCode: courseCode,
