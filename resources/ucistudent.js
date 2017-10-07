@@ -136,7 +136,7 @@ function getDegreeWorks(uciauth) {
                         }
 
                         let blockName = block['$'].Title;
-                        console.log('Scanning Valid Block:', blockName);
+                        //console.log('Scanning Valid Block:', blockName);
                         advice[blockName] = {};
 
                         //Woo there are some classes we have to take, go through all the rules to check them out
@@ -149,7 +149,7 @@ function getDegreeWorks(uciauth) {
                             }
 
                             let ruleName = rule['$'].Label;
-                            console.log('Scanning Valid Rule:', ruleName);
+                            //console.log('Scanning Valid Rule:', ruleName);
                             advice[blockName][ruleName] = {
                                 "ClassesNeeded": parseInt(rule.Advice[0]['$'].Classes),
                                 "Classes": []
@@ -203,7 +203,7 @@ function getCompletedCourses(uciauth) {
             let num = $(tableData[2]).text();
 
             if (!completedCourses.hasOwnProperty(`${dept} ${num}`)) {
-                console.log(`${dept} ${num}`);
+                //console.log(`${dept} ${num}`);
                 completedCourses[`${dept} ${num}`] = true;
             }
         });
