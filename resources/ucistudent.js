@@ -258,5 +258,5 @@ function getCompletedCourses(uciauth) {
 
 module.exports.login = login;
 module.exports.getCompletedCourses = getCompletedCourses;
-module.exports.getTransferCourses = getTransferCourses;
+//module.exports.getTransferCourses = getTransferCourses;
 module.exports.getDegreeWorks = getDegreeWorks;
