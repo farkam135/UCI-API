@@ -1,5 +1,7 @@
 let rp = require('request-promise');
 
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 /**
  * An object representing a professor
  * @typedef {Object} Professor
@@ -19,22 +21,21 @@ let autoScrapeTimeout = null; //Holds onto the scrape timeout so it can be cance
 function refreshProfs() {
     //The options for the get request. qs pulled from recording network traffic when searching ratemyprofessor. 
     let options = {
-        url: 'http://search.mtvnservices.com/typeahead/suggest',
+        url: 'http://search.mtvnservices.com/typeahead/suggest/',
         qs: {
             solrformat: true,
-            rows: 5000,
             callback: 'noCB',
-            q: '*%3A*+AND+schoolid_s%3A1074',
+            q: '*:* AND schoolid_s:1074',
             defType: 'edismax',
-            qf: 'teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest',
-            bf: 'pow(total_number_of_ratings_i%2C2.1)',
-            sort: 'total_number_of_ratings_i+desc',
+            qf: 'teacherfirstname_t^2000 teacherlastname_t^2000 teacherfullname_t^2000 autosuggest',
+            bf: 'pow(total_number_of_ratings_i,2.1)',
+            sort: 'total_number_of_ratings_i desc',
             siteName: 'rmp',
             rows: 9999,
             start: 0,
-            fl: 'pk_id+teacherfirstname_t+teacherlastname_t+total_number_of_ratings_i+averageratingscore_rf+schoolid_s',
+            fl: 'pk_id teacherfirstname_t teacherlastname_t total_number_of_ratings_i averageratingscore_rf schoolid_s',
             fq: '',
-            prefix: 'schoolname_t%3A%22University+of+California+Irvine%22'
+            prefix: 'schoolname_t:"University of California Irvine"'
         },
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
