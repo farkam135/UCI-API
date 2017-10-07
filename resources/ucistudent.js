@@ -36,7 +36,11 @@ function login(ucinetid, password) {
         .then((response) => {
             let ucinetid_auth = response.headers['set-cookie'][0].split(';')[0];
             if (ucinetid_auth === 'ucinetid_auth=no_key') {
-                return Promise.reject('Invalid ucinetid or password');
+                let $ = cheerio.load(response.body, {
+                    normalizeWhitespace: true
+                });
+
+                return Promise.reject($('#status').text());
             }
 
             return ucinetid_auth;
