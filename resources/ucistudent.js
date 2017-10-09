@@ -199,16 +199,26 @@ function getCompletedCourses(uciauth) {
         let completedCourses = {};
         $('#studylistTable tr[valign=top]').each(function (i) {
             let tableData = $(this).children();
+            let YearTerm = /\?YearTerm=(.+?)&/.exec($($(tableData[0]).children()[0]).attr('href'))[1]; //We have to get the a tag within the tableData and then extract the YearTerm from the href
+            let code = $(tableData[0]).text().trim();;
             let dept = $(tableData[1]).text();
             let num = $(tableData[2]).text();
+            let type = $(tableData[4]).text();
+            let instructor = $($(tableData[11]).find('tr')[0]).text().trim(); //We only care about the main instructor (the first one)
 
-            if (!completedCourses.hasOwnProperty(`${dept} ${num}`)) {
+            if (type === "LEC" && !completedCourses.hasOwnProperty(`${dept} ${num}`)) {
                 //console.log(`${dept} ${num}`);
-                completedCourses[`${dept} ${num}`] = true;
+                completedCourses[`${dept} ${num}`] = {
+                    YearTerm,
+                    code,
+                    dept,
+                    num,
+                    mainInstructor
+                };
             }
         });
 
-        return Object.keys(completedCourses);
+        return completedCourses;
     })
     .catch((err) => {
         return Promise.reject(err);
