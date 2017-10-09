@@ -235,7 +235,6 @@ function getCompletedCourses(uciauth) {
         });
 
         $('#chrono-view tr.grades').each(function() {
-            console.log($(this).text())
             let tableData = $(this).children();
             let dept = $(tableData[2]).text();
             let num = $(tableData[3]).text();
