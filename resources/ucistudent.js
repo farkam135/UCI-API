@@ -175,23 +175,83 @@ function getDegreeWorks(uciauth) {
 }
 
 /**
- * Returns a promise to an array of courses the provided uciauth has registered for.
+ * Returns a promise to an object of courses the provided uciauth has completed/is currently completing.
  * For more information and examples visit: TBA
  * @param {string} uciauth UCI student auth provided by login.
- * @return {promise} The promise to an array of courses the user has registered for.
+ * @return {promise} The promise to an object of courses the user has completed/is currently completing.
  */
 function getCompletedCourses(uciauth) {
-    let options = {
+    let studyList = {
         url: 'https://www.reg.uci.edu/access/student/studylist/?seg=U',
         method: 'GET',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Cookie': [uciauth]
         }
-        //resolveWithFullResponse: true
     }
 
-    return rp(options).then((response) => {
+    let transcript = {
+        url: 'https://www.reg.uci.edu/access/student/transcript/?seg=U',
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cookie': [uciauth]
+        }
+    }
+
+    return Promise.all([rp(studyList), rp(transcript)])
+    .then((response) => {
+        //First let's populate all the courses in their study list
+        let $ = cheerio.load(response[0], {
+            normalizeWhitespace: true
+        });
+
+        let completedCourses = {};
+        $('#studylistTable tr[valign=top]').each(function (i) {
+            let tableData = $(this).children();
+            let YearTerm = /\?YearTerm=(.+?)&/.exec($($(tableData[0]).children()[0]).attr('href'))[1]; //We have to get the a tag within the tableData and then extract the YearTerm from the href
+            let code = $(tableData[0]).text().trim();;
+            let dept = $(tableData[1]).text();
+            let num = $(tableData[2]).text();
+            let type = $(tableData[4]).text();
+            let instructor = $($(tableData[11]).find('tr')[0]).text().trim(); //We only care about the main instructor (the first one)
+
+            if (type !== "DIS" && !completedCourses.hasOwnProperty(`${dept} ${num}`)) {
+                //console.log(`${dept} ${num}`);
+                completedCourses[`${dept} ${num}`] = {
+                    YearTerm,
+                    code,
+                    dept,
+                    num,
+                    instructor
+                };
+            }
+        });
+
+
+        //Now let's get their grades and add them to their corresponding course
+        $ = cheerio.load(response[1], {
+            normalizeWhitespace: true
+        });
+
+        $('#chrono-view tr.grades').each(function() {
+            console.log($(this).text())
+            let tableData = $(this).children();
+            let dept = $(tableData[2]).text();
+            let num = $(tableData[3]).text();
+            let grade = $(tableData[5]).text();
+
+            //Add their grade to the completedCourses
+            completedCourses[`${dept} ${num}`].grade = grade;
+        });
+
+        return completedCourses;
+    })
+    .catch((err) => {
+        return Promise.reject(err);
+    });
+
+    /* return rp(options).then((response) => {
         let $ = cheerio.load(response, {
             normalizeWhitespace: true
         });
@@ -220,9 +280,7 @@ function getCompletedCourses(uciauth) {
 
         return completedCourses;
     })
-    .catch((err) => {
-        return Promise.reject(err);
-    })
+     */
 }
 
 /**
