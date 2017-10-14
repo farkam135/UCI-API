@@ -107,18 +107,15 @@ function getDegreeWorks(uciauth) {
                             id: Audit.AuditHeader[0]['$'].Stu_id,
                             units: Audit.AuditHeader[0]['$'].ResApp,
                             units_p: Audit.AuditHeader[0]['$'].ResAppInProg
-                        },
-                        courses: {
-                            //Added after
                         }
                     }
 
                     //Add in progress classes
-                    let in_progress = [];
+                    /* let in_progress = [];
                     Audit.In_progress[0].Class.forEach((course) => {
                         in_progress.push(course['$'].Discipline + ' ' + course['$'].Number);
                     });
-                    dw.courses.in_progress = in_progress;
+                    dw.courses.in_progress = in_progress; */
 
                     let advice = {};
                     //Add courses that count towards graduation
@@ -164,7 +161,7 @@ function getDegreeWorks(uciauth) {
                         });
                     });
 
-                    dw.courses.advice = advice;
+                    dw.advice = advice;
 
                     resolve(dw);
                 } else reject(err);
@@ -180,7 +177,7 @@ function getDegreeWorks(uciauth) {
  * @param {string} uciauth UCI student auth provided by login.
  * @return {promise} The promise to an object of courses the user has completed/is currently completing.
  */
-function getCompletedCourses(uciauth) {
+function getCourses(uciauth) {
     let studyList = {
         url: 'https://www.reg.uci.edu/access/student/studylist/?seg=U',
         method: 'GET',
@@ -206,30 +203,39 @@ function getCompletedCourses(uciauth) {
             normalizeWhitespace: true
         });
 
-        let completedCourses = {};
+        let courses = {};
         $('#studylistTable tr[valign=top]').each(function (i) {
             let tableData = $(this).children();
             let YearTerm = /\?YearTerm=(.+?)&/.exec($($(tableData[0]).children()[0]).attr('href'))[1]; //We have to get the a tag within the tableData and then extract the YearTerm from the href
             let code = $(tableData[0]).text().trim();;
             let dept = $(tableData[1]).text();
             let num = $(tableData[2]).text();
+            let title = $(tableData[3]).text();
             let type = $(tableData[4]).text();
+            let days = $(tableData[8]).text().trim();
+            let time = $(tableData[9]).text().trim();
+            let location = $(tableData[10]).text();
             let instructor = $($(tableData[11]).find('tr')[0]).text().trim(); //We only care about the main instructor (the first one)
 
-            if (type !== "DIS" && !completedCourses.hasOwnProperty(`${dept} ${num}`)) {
+            if (type !== "DIS" && !courses.hasOwnProperty(`${dept} ${num}`)) {
                 //console.log(`${dept} ${num}`);
-                completedCourses[`${dept} ${num}`] = {
+                courses[`${dept} ${num}`] = {
                     YearTerm,
                     code,
                     dept,
                     num,
+                    title,
+                    days,
+                    time,
+                    location,
                     instructor
                 };
             }
         });
 
 
-        //Now let's get their grades and add them to their corresponding course
+        let completedCourses = {};
+        //Now let's get their grades and add them to their corresponding course. If a course has a grade add it to the completedCourses object
         $ = cheerio.load(response[1], {
             normalizeWhitespace: true
         });
@@ -240,11 +246,16 @@ function getCompletedCourses(uciauth) {
             let num = $(tableData[3]).text();
             let grade = $(tableData[5]).text();
 
-            //Add their grade to the completedCourses
-            completedCourses[`${dept} ${num}`].grade = grade;
+            //Add their grade to the courses and move them to the completedCourses object
+            courses[`${dept} ${num}`].grade = grade;
+            completedCourses[`${dept} ${num}`] = courses[`${dept} ${num}`];
+            delete courses[`${dept} ${num}`];
         });
 
-        return completedCourses;
+        return {
+            inProgress: courses,
+            completed: completedCourses
+        };
     })
     .catch((err) => {
         return Promise.reject(err);
@@ -328,6 +339,6 @@ function getCompletedCourses(uciauth) {
 } */
 
 module.exports.login = login;
-module.exports.getCompletedCourses = getCompletedCourses;
+module.exports.getCourses = getCourses;
 //module.exports.getTransferCourses = getTransferCourses;
 module.exports.getDegreeWorks = getDegreeWorks;
