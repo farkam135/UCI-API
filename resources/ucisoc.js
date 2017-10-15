@@ -86,11 +86,15 @@ function searchSchedule(search) {
  * function had to be invoked beforehand with the department of the course you are getting details for (e.g. If you wanted to use 
  * getCourseDetails('COMPSCI 121') you would only get back undefined unless you ran loadDept('COMPSCI') beforehand). Since this function
  * is using the local SOC calls to getCourseDetails does not make any additional requests to UCI.
- * @param {string} name The full name of the course you want to get details for (i.e. 'COMPSCI 121')
- * @return {promise} The promise that will resolve to the course object
+ * @param {Array[string]} courses An array of course's full names you want to get details for (i.e. ['COMPSCI 121'])
+ * @return {promise} The promise that will resolve to an object with the keys being the course name and the value being the course object.
  */
-function getCourseDetails(name) {
-  return SOC[name];
+function getCourseDetails(courses) {
+  let courseDetails = {};
+  courses.forEach((name) => {
+    courseDetails[name] = SOC[name];
+  });
+  return courseDetails;
 }
 
 /**
