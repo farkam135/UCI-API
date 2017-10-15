@@ -217,7 +217,7 @@ function getCourses(uciauth) {
             let location = $(tableData[10]).text();
             let instructor = $($(tableData[11]).find('tr')[0]).text().trim(); //We only care about the main instructor (the first one)
 
-            if (type !== "DIS" && !courses.hasOwnProperty(`${dept} ${num}`)) {
+            if (type !== "DIS" && type !== "TUT" && !courses.hasOwnProperty(`${dept} ${num}`)) {
                 //console.log(`${dept} ${num}`);
                 courses[`${dept} ${num}`] = {
                     YearTerm,
@@ -245,11 +245,16 @@ function getCourses(uciauth) {
             let dept = $(tableData[2]).text();
             let num = $(tableData[3]).text();
             let grade = $(tableData[5]).text();
+            let courseIdentifier = `${dept} ${num}`;
 
             //Add their grade to the courses and move them to the completedCourses object
-            courses[`${dept} ${num}`].grade = grade;
-            completedCourses[`${dept} ${num}`] = courses[`${dept} ${num}`];
-            delete courses[`${dept} ${num}`];
+            if(courses[courseIdentifier] === undefined){
+                return;
+            }
+
+            courses[courseIdentifier].grade = grade;
+            completedCourses[courseIdentifier] = courses[courseIdentifier];
+            delete courses[courseIdentifier];
         });
 
         return {
