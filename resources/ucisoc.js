@@ -75,9 +75,9 @@ function searchSchedule(search) {
   return rp(options).then(response => {
     return parseSOC(response.body);
   })
-  .catch((err) => {
-    return Promise.reject(err);
-  })
+    .catch((err) => {
+      return Promise.reject(err);
+    })
 }
 
 /**
@@ -108,10 +108,7 @@ function getCatalogueByDept(Dept) {
   let catalogueDeptName = Dept.toLowerCase().replace(/\s|\/|&/g, '_');
 
   if (NO_CAT_DEPTS.includes(Dept)) {
-    return {
-      success: true,
-      data: {}
-    }
+    return {};
   }
   else if (OVERWRITE_CAT_DEPTS[Dept] !== undefined) {
     catalogueDeptName = OVERWRITE_CAT_DEPTS[Dept];
@@ -157,10 +154,7 @@ function getCatalogueByDept(Dept) {
  */
 function getPrereqsByDept(Dept) {
   if (YEAR_TERM === undefined) {
-    return Promise.reject({
-      success: false,
-      error: 'YEAR_TERM not loaded, please run load() before attempting to access SOC'
-    });
+    return Promise.reject('YEAR_TERM not loaded, please run load() before attempting to access SOC');
   }
 
   let options = {
@@ -210,7 +204,7 @@ function getPrereqsByDept(Dept) {
       });
     });
 
-    return courses;
+    return courses
   })
     .catch((err) => {
       return Promise.reject(err);
@@ -246,31 +240,26 @@ function loadDept(dept) {
       return getPrereqsByDept(dept);
     })
     .then((res) => {
-      if (!res.success) {
-        return Promise.reject(`Unable to get prereqs for: ${dept} Error: ${res.error}`);
-      }
-
-      Object.keys(res.data).forEach((course) => {
+      Object.keys(res).forEach((course) => {
         if (SOC[course] === undefined) return;
-        SOC[course].prereqs = res.data[course];
+        SOC[course].prereqs = res[course];
       });
 
       return getCatalogueByDept(dept);
     })
     .then((res) => {
-      if (!res.success) {
-        return Promise.reject(`Unable to get catalogue for: ${dept} Error: ${res.error}`);
-      }
-
-      Object.keys(res.data).forEach((course) => {
+      Object.keys(res).forEach((course) => {
         if (SOC[course] === undefined) return;
-        SOC[course].fullName = res.data[course].fullName;
-        SOC[course].description = res.data[course].description;
+        SOC[course].fullName = res[course].fullName;
+        SOC[course].description = res[course].description;
         //console.log(SOC[course]);
       });
 
       return Promise.resolve();
-    });
+    })
+    .catch((err) => {
+      console.error(err);
+    })
 }
 
 /**
@@ -280,7 +269,7 @@ function loadDept(dept) {
  * @return {promise} A promise that resolves when the local SOC is completely populated.
  */
 function loadAll() {
-  if(DEPTS.length === 0){
+  if (DEPTS.length === 0) {
     return Promise.reject('DEPTS not populated, please run init() before attempting to load the local SOC.');
   }
   return new Promise((resolve, reject) => {
