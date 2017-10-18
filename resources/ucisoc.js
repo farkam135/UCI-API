@@ -8,7 +8,7 @@ const NO_CAT_DEPTS = ['EHS', 'MED HUM', 'OB/GYN', 'PLASTIC', 'PM&R']; //The depa
 const OVERWRITE_CAT_DEPTS = {
   'GLBL ME': 'glblme'
 }; //The catalogue departments that don't follow the standard rule of \s,/,& = _
-const NO_CACHE_KEYS = ['Final', 'Max', 'Enr', 'WL', 'Req']; //The columns not to add to the SOC cache, since these change pretty often they are pulled on searchSchedule
+const NO_CACHE_KEYS = ['Final', 'Max', 'Enr', 'WL', 'Req', 'Status']; //The columns not to add to the SOC cache, since these change pretty often they are pulled on searchSchedule
 
 
 let SOC = {}; //The SOC "cache", populated using the "loadDept" function which fills in the SOC object with all the information related to a course.
