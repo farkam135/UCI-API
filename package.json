@@ -4,8 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec \"babel-node app.js --presets es2015,stage-2\" index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kamron Erani",
   "license": "ISC",
