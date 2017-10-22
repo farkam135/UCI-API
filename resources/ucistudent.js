@@ -212,6 +212,7 @@ function getCourses(uciauth) {
                 let num = $(tableData[2]).text();
                 let title = $(tableData[3]).text();
                 let type = $(tableData[4]).text();
+                let opt = $(tableData[7]).text();
                 let days = $(tableData[8]).text().trim();
                 let time = $(tableData[9]).text().trim();
                 let location = $(tableData[10]).text();
@@ -243,7 +244,7 @@ function getCourses(uciauth) {
                     //Supplementary course, add it to it's lecture course object
                     courses[`${dept} ${num}`][type] = newCourse
                 }
-                else {
+                else if (opt !== '') {
                     //Main course
                     courses[`${dept} ${num}`] = newCourse;
                 }
