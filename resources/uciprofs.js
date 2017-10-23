@@ -55,7 +55,8 @@ function refreshProfs() {
                     rating: prof.averageratingscore_rf
                 };
 
-                PROFS[`${nProf.lastName}, ${nProf.firstName[0]}.`] = nProf; //Set the key to the value that is seen in the schedule of classes for lookup.
+                nProf.name = `${nProf.lastName}, ${nProf.firstName[0]}.`;
+                PROFS[nProf.name] = nProf; //Set the key to the value that is seen in the schedule of classes for lookup.
             });
 
             return Promise.resolve();
