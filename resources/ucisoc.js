@@ -8,7 +8,7 @@ const NO_CAT_DEPTS = ['EHS', 'MED HUM', 'OB/GYN', 'PLASTIC', 'PM&R']; //The depa
 const OVERWRITE_CAT_DEPTS = {
   'GLBL ME': 'glblme'
 }; //The catalogue departments that don't follow the standard rule of \s,/,& = _
-const NO_CACHE_KEYS = ['Final', 'Max', 'Enr', 'WL', 'Req', 'Status']; //The columns not to add to the SOC cache, since these change pretty often they are pulled on searchSchedule
+//const CACHE_KEYS = ['Code']; //The columns to add to the SOC cache, for now it's just Code
 
 
 let SOC = {}; //The SOC "cache", populated using the "loadDept" function which fills in the SOC object with all the information related to a course.
@@ -162,7 +162,7 @@ function getPrereqsByDept(Dept) {
     method: "GET",
     qs: {
       dept: Dept.toUpperCase(),
-      action: "view_by_term",
+      action: "view_all",
       term: YEAR_TERM.replace('-', '')
     },
     headers: {
@@ -220,20 +220,32 @@ function getPrereqsByDept(Dept) {
  */
 function loadDept(dept) {
   console.log(`Loading Department: ${dept}`);
-  return searchSchedule({
-    Dept: dept
-  })
+  return getCatalogueByDept(dept)
+    .then((res) => {
+      Object.keys(res).forEach((course) => {
+        SOC[course] = res[course];
+        //console.log(SOC[course]);
+      });
+
+      return searchSchedule({ Dept: dept });
+    })
     .then((courses) => {
       //Go through all the courses of a search result and set them in the local SOC with their key being dept + ' ' + num (e.g. COMPSCI 122B)
       courses.forEach((course) => {
-        //Go through all the course offerings and delete all NO_CACHE_KEYS
-        course.offerings.forEach((offering) => {
-          NO_CACHE_KEYS.forEach((key) => {
-            delete offering[key];
-          });
+        let courseName = `${course.dept} ${course.num}`
+
+        //Go through all the course offerings and add their course code a offerings array and reset it.
+        let offerings = [];
+        course.offerings.forEach((offering, i) => {
+          offerings.push(offering.Code);
         });
 
-        SOC[`${course.dept} ${course.num}`] = course;
+        course.offerings = offerings;
+
+        if(SOC[courseName] === undefined){
+          SOC[courseName] = {};
+        }
+        SOC[courseName] = Object.assign(SOC[courseName], course);
       });
 
       //Once we set all the courses being offered this quarter for the dept, we load up the prereqs and set those as well
@@ -241,18 +253,11 @@ function loadDept(dept) {
     })
     .then((res) => {
       Object.keys(res).forEach((course) => {
-        if (SOC[course] === undefined) return;
-        SOC[course].prereqs = res[course];
-      });
+        if(SOC[course] === undefined){
+          SOC[course] = {};
+        }
 
-      return getCatalogueByDept(dept);
-    })
-    .then((res) => {
-      Object.keys(res).forEach((course) => {
-        if (SOC[course] === undefined) return;
-        SOC[course].fullName = res[course].fullName;
-        SOC[course].description = res[course].description;
-        //console.log(SOC[course]);
+        SOC[course].prereqs = res[course];
       });
 
       return Promise.resolve();
@@ -366,5 +371,6 @@ function parseSOC(html) {
 
 module.exports.init = init;
 module.exports.loadAll = loadAll;
+module.exports.loadDept = loadDept;
 module.exports.searchSchedule = searchSchedule;
 module.exports.getCourseDetails = getCourseDetails;
