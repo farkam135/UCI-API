@@ -332,7 +332,7 @@ function parseSOC(html) {
 
       currentCourse.dept = courseTitleArray[1].toUpperCase();
       currentCourse.num = courseTitleArray[2];
-      currentCourse.name = courseTitleArray[3];
+      currentCourse.name = courseTitleArray[3].replace('&amp;','&');
     }
     //Course headers
     else if ($(tr).attr('bgcolor') === '#E7E7E7') {
