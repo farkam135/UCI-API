@@ -330,7 +330,7 @@ function parseSOC(html) {
       let courseTitleTd = $($(tr).children()[0]).html();
       let courseTitleArray = /\s?(.+)\s(.+)\s<.+<b>(.+)<\/b>/.exec(courseTitleTd); //Splits up the dept, num and name from the courseTitleTd html
 
-      currentCourse.dept = courseTitleArray[1].toUpperCase();
+      currentCourse.dept = courseTitleArray[1].toUpperCase().replace(/&amp;/ig,'&');
       currentCourse.num = courseTitleArray[2];
       currentCourse.name = courseTitleArray[3].replace(/&amp;/ig,'&');
     }
