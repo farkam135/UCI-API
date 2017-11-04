@@ -118,7 +118,7 @@ function getCatalogueByDept(Dept) {
   let catalogueDeptName = Dept.toLowerCase().replace(/\s|\/|&/g, '_');
 
   if (NO_CAT_DEPTS.includes(Dept)) {
-    return {};
+    return Promise.resolve({});
   }
   else if (OVERWRITE_CAT_DEPTS[Dept] !== undefined) {
     catalogueDeptName = OVERWRITE_CAT_DEPTS[Dept];
