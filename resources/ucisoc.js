@@ -18,7 +18,7 @@ let SOC = {}; //The SOC "cache", populated using the "loadDept" function which f
  * @return {promise} Promise that resolves if successfully initialized.
  */
 function init() {
-  let yearTermRegEx = /<option value="(\d{4}-\d{2})".+selected/g;
+  let yearTermRegEx = /<select name="YearTerm">\n\s+<option value="(\d{4}-\d{2})"/g;
   let deptRegEx = /<option value="(.+)">(\1.+\..+)<\/option>/g;
 
   return rp("https://www.reg.uci.edu/perl/WebSoc").then((response) => {
