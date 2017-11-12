@@ -46,7 +46,7 @@ function refreshProfs() {
         .then((response) => {
             let profs = JSON.parse(/noCB\(((.|\n)*)\);/g.exec(response)[1]); //The response is wrapped in noCB like noCB({...}); so use regex to just get the json
             profs.response.docs.forEach((prof) => {
-                if (!prof.averageratingscore_rf || prof.total_number_of_ratings_i === 0) prof.averageratingscore_rf = "NULL"; //If they don't have any ratings set their score to NULL instead of 0
+                if (!prof.averageratingscore_rf || prof.total_number_of_ratings_i === 0) return; //If they don't have any ratings don't add them to the cache
 
                 let nProf = {
                     id: prof.pk_id,
