@@ -348,7 +348,7 @@ function parseSOC(html) {
 
         //If we are currently on Instructor then we have to check for multiple instructors and set it as an array rather than just text
         if (currentCourseHeaders[i] === 'Instructor') {
-          data = $(td).html().split('<br>').filter((instructor) => {
+          data = $(td).html().replace("&apos;","'").split('<br>').filter((instructor) => {
             return instructor !== '';
           });
         }
