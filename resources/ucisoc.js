@@ -163,17 +163,12 @@ function getCatalogueByDept(Dept) {
  * @return {promise} A promise that resolves to an object with the key being the course name (i.e. 'COMPSCI 121') and the value being a prereq array. 
  */
 function getPrereqsByDept(Dept) {
-  if (YEAR_TERM === undefined) {
-    return Promise.reject('YEAR_TERM not loaded, please run load() before attempting to access SOC');
-  }
-
   let options = {
     url: "https://www.reg.uci.edu/cob/prrqcgi",
     method: "GET",
     qs: {
       dept: Dept.toUpperCase(),
-      action: "view_all",
-      term: YEAR_TERM.replace('-', '')
+      action: "view_all"
     },
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
@@ -192,24 +187,20 @@ function getPrereqsByDept(Dept) {
       if (i === 0) return; //The first tr is the headers, so ignore
       let tableData = $(this).children();
       let course = $(tableData[0]).text().trim();
-      let prereqText = $(tableData[2]).text().replace('UPPER DIVISION STANDING ONLY', '');
+      let prereqText = $(tableData[2]).html();
 
-      if (course.length === 0) return;
+      if (!course.length) return;
       courses[course] = [];
-      prereqText.split("AND").forEach(prereq => {
-        if (prereq.length === 1) return;
-
+      prereqText.split('<br><b>AND</b><br>').forEach(prereq => {
         let optCourses = [];
-        if (prereq.trim()[0] == "(") prereq = /\s*\(?(.+)\)/g.exec(prereq)[1];
-        prereq.split("OR").forEach(optPrereq => {
+        prereq.split('<b>OR</b>').forEach(optPrereq => {
           if (optPrereq.includes("recommended")) return;
-          if (optPrereq.includes("(")) {
-            optCourses.push(/(\w.+) \(/g.exec(optPrereq)[1].trim());
-          } else {
-            optCourses.push(optPrereq.trim());
-          }
+
+          optPrereq = optPrereq.replace(/<b>.*?<\/b>/g, '').replace('&amp;', '&').trim();
+          if (!optPrereq.length) return;
+          optCourses.push(optPrereq);
         });
-        if (optCourses.length == 0) return;
+        if (!optCourses.length) return;
         courses[course].push(optCourses);
       });
     });
@@ -252,7 +243,7 @@ function loadDept(dept) {
 
         course.offerings = offerings;
 
-        if(SOC[courseName] === undefined){
+        if (SOC[courseName] === undefined) {
           SOC[courseName] = {};
         }
         SOC[courseName] = Object.assign(SOC[courseName], course);
@@ -263,7 +254,7 @@ function loadDept(dept) {
     })
     .then((res) => {
       Object.keys(res).forEach((course) => {
-        if(SOC[course] === undefined){
+        if (SOC[course] === undefined) {
           SOC[course] = {};
         }
 
@@ -330,9 +321,9 @@ function parseSOC(html) {
       let courseTitleTd = $($(tr).children()[0]).html();
       let courseTitleArray = /\s?(.+)\s(.+)\s<.+<b>(.+)<\/b>/.exec(courseTitleTd); //Splits up the dept, num and name from the courseTitleTd html
 
-      currentCourse.dept = courseTitleArray[1].toUpperCase().replace(/&amp;/ig,'&');
+      currentCourse.dept = courseTitleArray[1].toUpperCase().replace(/&amp;/ig, '&');
       currentCourse.num = courseTitleArray[2];
-      currentCourse.name = courseTitleArray[3].replace(/&amp;/ig,'&');
+      currentCourse.name = courseTitleArray[3].replace(/&amp;/ig, '&');
     }
     //Course headers
     else if ($(tr).attr('bgcolor') === '#E7E7E7') {
@@ -348,7 +339,7 @@ function parseSOC(html) {
 
         //If we are currently on Instructor then we have to check for multiple instructors and set it as an array rather than just text
         if (currentCourseHeaders[i] === 'Instructor') {
-          data = $(td).html().replace("&apos;","'").split('<br>').filter((instructor) => {
+          data = $(td).html().replace("&apos;", "'").split('<br>').filter((instructor) => {
             return instructor !== '';
           });
         }
