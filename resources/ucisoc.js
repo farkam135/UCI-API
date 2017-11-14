@@ -183,12 +183,14 @@ function getPrereqsByDept(Dept) {
 
   return rp(options).then($ => {
     let courses = {};
+    console.log($(".error_message").text());
     $("table[align=center] tr").each(function (i) {
       if (i === 0) return; //The first tr is the headers, so ignore
       let tableData = $(this).children();
       let course = $(tableData[0]).text().trim();
       let prereqText = $(tableData[2]).html();
 
+      if (!prereqText) return;
       if (!course.length) return;
       courses[course] = [];
       prereqText.split('<br><b>AND</b><br>').forEach(prereq => {
