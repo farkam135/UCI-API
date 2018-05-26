@@ -1,13 +1,9 @@
 export const UCI = {
   //SOC: require("./resources/ucisoc"),
   //WEBREG: require("./resources/uciwebreg"),
-  //STUDENT: require("./resources/ucistudent"),
+  STUDENT: require("./resources/ucistudent"),
   PROFS: require("./resources/uciprofs")
 };
-
-UCI.PROFS.refreshProfs().then((a: boolean) => {
-  console.log(a);
-});
 
 //test.SOC.init()
 //.then(() => {

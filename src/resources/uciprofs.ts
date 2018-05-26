@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { ProfessorObj, RMPProfessor, Professor, Result } from "../interfaces";
+import { ProfessorObj, RMPProfessor, Professor } from "../interfaces";
 
 axios.defaults.headers.common["Content-Type"] =
   "application/x-www-form-urlencoded";
@@ -8,9 +8,9 @@ const PROFS: ProfessorObj = {};
 
 /**
  * Refreshes all the professors from ratemyprofessor so they can later be pulled with {@link getProfessor|getProfessor}.
- * @return {Promise<Result>} A promise that resolves if successful.
+ * @return {Promise<void>} A promise that resolves if successful.
  */
-export async function refreshProfs(): Promise<Result> {
+export async function refreshProfs(): Promise<void> {
   const requestConfig: AxiosRequestConfig = {
     url: "http://search.mtvnservices.com/typeahead/suggest/",
     params: {
@@ -52,15 +52,8 @@ export async function refreshProfs(): Promise<Result> {
       nProf.name = `${nProf.lastName}, ${nProf.firstName[0]}.`;
       PROFS[nProf.name] = nProf; //Set the key to the value that is seen in the schedule of classes for lookup.
     });
-
-    return {
-      success: true
-    };
   } catch (e) {
-    return {
-      success: false,
-      data: e
-    };
+    throw e;
   }
 }
 
