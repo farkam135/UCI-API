@@ -1,4 +1,4 @@
-export interface Course {
+export interface StudentCourse {
   YearTerm: string;
   code: string;
   dept: string;
@@ -9,10 +9,10 @@ export interface Course {
   location: string;
   instructor: string;
   grade?: string;
-  DIS?: Course;
+  DIS?: StudentCourse;
 }
 
 export interface StudentCourses {
-  inProgress: { [key: string]: Course };
-  completed: { [key: string]: Course };
+  inProgress: { [key: string]: StudentCourse };
+  completed: { [key: string]: StudentCourse };
 }

@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import { parseString } from "xml2js";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { Course, StudentCourses } from "../interfaces";
+import { StudentCourse, StudentCourses } from "../interfaces";
 
 axios.defaults.headers.common["Content-Type"] =
   "application/x-www-form-urlencoded";
@@ -79,7 +79,7 @@ export async function getCourses(uciauth: string): Promise<StudentCourses> {
     normalizeWhitespace: true
   });
 
-  const courses: { [key: string]: Course } = {};
+  const courses: { [key: string]: StudentCourse } = {};
   $("#studylistTable tr[valign=top]").each(function(i) {
     let tableData = $(this).children();
     let YearTerm = /\?YearTerm=(.+?)&/.exec(
@@ -113,7 +113,7 @@ export async function getCourses(uciauth: string): Promise<StudentCourses> {
       return;
     }
 
-    let newCourse: Course = {
+    let newCourse: StudentCourse = {
       YearTerm,
       code,
       dept,
@@ -133,7 +133,7 @@ export async function getCourses(uciauth: string): Promise<StudentCourses> {
     }
   });
 
-  const completedCourses: { [key: string]: Course } = {};
+  const completedCourses: { [key: string]: StudentCourse } = {};
 
   //Now let's get their grades and add them to their corresponding course. If a course has a grade add it to the completedCourses object
   $ = load(transcript, {
